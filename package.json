@@ -1,0 +1,29 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "description": "This is a cli applicatio that shoud authorize transactions and create an account following some given rules",
+  "main": "auth.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "bin": {
+    "auth": "./bin/auth.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brunabursi/cli-basics.git"
+  },
+  "keywords": [
+    "auth",
+    "challenge",
+    "authorizer",
+    "cli",
+    "node"
+  ],
+  "author": "Bruna Bursi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brunabursi/cli-basics/issues"
+  },
+  "homepage": "https://github.com/brunabursi/cli-basics#readme"
+}
