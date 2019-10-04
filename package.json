@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/brunabursi/cli-basics/issues"
   },
-  "homepage": "https://github.com/brunabursi/cli-basics#readme"
+  "homepage": "https://github.com/brunabursi/cli-basics#readme",
+  "dependencies": {
+    "commander": "^3.0.2"
+  }
 }

@@ -1,4 +1,7 @@
+#! /usr/bin/env node
+const program = require('commander')
 const readline = require('readline')
+const pkg = require('../package.json')
 
 const state = {
     account: null,
@@ -20,48 +23,58 @@ const rl = readline.createInterface({
 })
 
 rl.on('line', item => {
-    let operation = JSON.parse(item)
+    if (!item) {
+        program
+            .version(pkg.version)
+            .name(pkg.name)
+            .usage('<JSON-lines-path>')
+            .outputHelp()
 
-    if (operation.account) {
-        if (state.account === null) {
-            state.account = operation.account
-        } else {
-            state.violations.push(rules.ACCOUNT_ALREADY_INITIALIZED)
-        }
-    }
+        process.exit(1)
+    } else {
+        let operation = JSON.parse(item)
 
-    if (operation.transaction) {
-        if (state.account == null) {
-            state.violations.push(rules.CARD_NOT_ACTIVE)
-        } else {
-
-            if (processedTransactions.find(txn => {
-                let invalidDate = new Date(operation.transaction.time) - new Date(txn.time) < 120000
-                let equalAmount = txn.amount === operation.transaction.amount
-
-                return equalAmount && invalidDate
-            })
-            ) {
-                state.violations.push(rules.DOUBLED_TRANSACTION)
-
-            } else if (processedTransactions.filter(txn => {
-                let invalidTime = new Date(operation.transaction.time) - new Date(txn.time) < 120000
-
-                return invalidTime
-            }).length >= 3) {
-                state.violations.push(rules.HIGH_FREQUENCY_SMALL_INTERVAL)
+        if (operation.account) {
+            if (state.account === null) {
+                state.account = operation.account
             } else {
-                let limit = state.account.availableLimit
-                let amount = operation.transaction.amount
+                state.violations.push(rules.ACCOUNT_ALREADY_INITIALIZED)
+            }
+        }
 
-                if (limit - amount >= 0) {
-                    state.account.availableLimit = limit - amount
-                    processedTransactions.push(operation.transaction)
+        if (operation.transaction) {
+            if (state.account == null) {
+                state.violations.push(rules.CARD_NOT_ACTIVE)
+            } else {
+
+                if (processedTransactions.find(txn => {
+                    let invalidDate = new Date(operation.transaction.time) - new Date(txn.time) < 120000
+                    let equalAmount = txn.amount === operation.transaction.amount
+
+                    return equalAmount && invalidDate
+                })
+                ) {
+                    state.violations.push(rules.DOUBLED_TRANSACTION)
+
+                } else if (processedTransactions.filter(txn => {
+                    let invalidTime = new Date(operation.transaction.time) - new Date(txn.time) < 120000
+
+                    return invalidTime
+                }).length >= 3) {
+                    state.violations.push(rules.HIGH_FREQUENCY_SMALL_INTERVAL)
                 } else {
-                    state.violations.push(rules.INSUFFICIENT_LIMIT)
+                    let limit = state.account.availableLimit
+                    let amount = operation.transaction.amount
+
+                    if (limit - amount >= 0) {
+                        state.account.availableLimit = limit - amount
+                        processedTransactions.push(operation.transaction)
+                    } else {
+                        state.violations.push(rules.INSUFFICIENT_LIMIT)
+                    }
                 }
             }
         }
+        console.log(state)
     }
-    console.log(state)
 })
